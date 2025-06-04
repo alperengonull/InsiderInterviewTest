@@ -152,23 +152,86 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
                 min-width: 320px;
               }
         }
+             
         @media (max-width: 600px) {
+            .carousel-container {
+                width: 100vw;
+                min-width: unset;
+                padding: 8px 2vw;
+                margin: 0;
+                box-sizing: border-box;
+            }
+            .carousel-list {
+                gap: 8px;
+                padding-bottom: 8px;
+            }
             .carousel-item { 
-                width: 140px; 
-                height: 210px; 
-                min-width: 140px;
+                width: 92vw;
+                max-width: 320px;
+                min-width: 0;
+                height: 260px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 10px 8px;
+                border-radius: 10px;
+                margin: 0 auto;
+                box-sizing: border-box;
             }
             .carousel-img { 
-            height: 60px;
+                height: 80px;
+                margin-bottom: 8px;
+                border-radius: 8px;
             }
             .carousel-title {
-            font-size: 16px;
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+            .carousel-name {
+                font-size: 14px;
+                min-height: 24px;
+                margin-bottom: 4px;
+            }
+            .carousel-prices {
+                gap: 2px;
+            }
+            .carousel-original,
+            .carousel-discount {
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+            .carousel-price {
+                font-size: 15px;
+                margin-bottom: 2px;
+            }
+            .carousel-heart {
+                width: 24px;
+                height: 22px;
+                top: 10px;
+                right: 10px;
+            }
+            .carousel-stars {
+                gap: 1px;
+                margin-top: 2px;
+                margin-bottom: 2px;
+                align-self: flex-start;
+                transform: scale(0.7);
+            }
+            .carousel-stars svg {
+                width: 16px;
+                height: 16px;
+            }
+            .carousel-addcart {
+                font-size: 13px;
+                padding: 7px 0;
+                border-radius: 5px;
+                margin-top: 8px;
             }
         }
         `;
         document.head.appendChild(style);
 
-        // Carousel ana container
+        // Carousel main container ekliyorum.
         const container = document.createElement("div");
         container.className = "carousel-container";
         container.innerHTML = `
