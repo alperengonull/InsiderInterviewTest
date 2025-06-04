@@ -1,15 +1,17 @@
-// Sadece anasayfada çalışsın
+// Sadece anasayfada çalışacak
 if (window.location.pathname !== "/" && window.location.pathname !== "/index.html") {
     console.log("Sayfa bulunmuyor");
 } else {
     (async function () {
         // API ve localStorage anahtarlarını tanımladım
         const API_URL = "https://gist.githubusercontent.com/sevindi/8bcbde9f02c1d4abe112809c974e1f49/raw/9bf93b58df623a9b16f1db721cd0a7a539296cf0/products.json";
-        console.log(API_URL, "API GELDİ");
+        // console.log(API_URL, "API GELDİ");
         const LS_KEY = "my_products";
         const LS_FAV_KEY = "my_favorites";
+        const LS_STARS_KEY = "product_stars";
         let products = [];
         let favorites = JSON.parse(localStorage.getItem(LS_FAV_KEY)) || [];
+        let favoriteStars = JSON.parse(localStorage.getItem(LS_STARS_KEY)) || [];
 
         // Ürünleri önce localStorage'dan, eğer yoksa API'den çekiyorum.
         if (localStorage.getItem(LS_KEY)) {
@@ -24,7 +26,7 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
                 return;
             }
         }
-        sss
+
         // Stiller
         const style = document.createElement("style");
         style.innerHTML = `
@@ -42,7 +44,8 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 16px;
-            color: #222;
+            color: #ff6000;
+            
         }
         .carousel-list {
             display: flex;
@@ -52,7 +55,7 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
         }
         .carousel-item {
             width: 220px;
-            height: 300px;
+            height: 330px;
             background: #f9f9f9;
             border-radius: 10px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
@@ -120,6 +123,15 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             cursor: pointer;
             transition: fill .2s;
         }
+        .carousel-stars {
+            left: 20px;
+            width: 32px;
+            height: 28px;
+            cursor: pointer;
+            transition: fill .2s;
+            display:flex;
+            gap: 5px;
+        }
         .carousel-addcart {
             margin-top: auto;
             width: 100%;
@@ -137,12 +149,23 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             background: #e65500;
         }
         @media (max-width: 1300px) {
-            .carousel-container { width: 98vw; min-width: 320px; }
+            .carousel-container { 
+                width: 98vw;
+                min-width: 320px;
+              }
         }
         @media (max-width: 600px) {
-            .carousel-item { width: 140px; height: 210px; min-width: 140px; }
-            .carousel-img { height: 60px; }
-            .carousel-title { font-size: 16px; }
+            .carousel-item { 
+                width: 140px; 
+                height: 210px; 
+                min-width: 140px;
+            }
+            .carousel-img { 
+            height: 60px;
+            }
+            .carousel-title {
+            font-size: 16px;
+            }
         }
         `;
         document.head.appendChild(style);
@@ -193,18 +216,57 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             }
 
 
+            const starsContainer = document.createElement("div");
+            starsContainer.className = "carousel-stars";
+
+            let starCount = favoriteStars.find(obj => obj.id === product.id)?.star || 0;
+
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                star.setAttribute("viewBox", "0 0 24 24");
+                star.setAttribute("width", "24");
+                star.setAttribute("height", "24");
+                star.style.cursor = "pointer";
+                star.innerHTML = `
+                <path d="M12 .587l3.668 7.568 8.332 1.214-6.032 5.882 1.424 8.304L12 18.896l-7.392 3.855 1.424-8.304-6.032-5.882 8.332-1.214L12 .587z"
+                fill="${i <= starCount ? "#ff6000" : "none"}"
+                stroke="#ff6000"
+                stroke-width="2"/>
+                `;
+
+                // Yıldıza tıklayarak puan verme
+                star.onclick = (e) => {
+                    e.stopPropagation();
+                    starCount = i;
+                    // Yıldızın doluluk oranını güncelleme
+                    Array.from(starsContainer.children).forEach((s, idx) => {
+                        s.querySelector("path").setAttribute("fill", idx < starCount ? "#ff6000" : "none");
+                    });
+                    // localStorage'a kaydediyorum
+                    const idx = favoriteStars.findIndex(obj => obj.id === product.id);
+                    if (idx > -1) {
+                        favoriteStars[idx].star = starCount;
+                    } else {
+                        favoriteStars.push({ id: product.id, star: starCount });
+                    }
+                    localStorage.setItem(LS_STARS_KEY, JSON.stringify(favoriteStars));
+                };
+                starsContainer.appendChild(star);
+            }
+
+
             const heart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             heart.setAttribute("viewBox", "0 0 24 24");
             heart.classList.add("carousel-heart");
             heart.innerHTML = `
             <path d="M12 21s-7.5-6.2-9.5-9.2C-1.1 7.5 2.4 3 7 3c2.1 0 4.1 1.1 5 2.7C13.9 4.1 15.9 3 18 3c4.6 0 8.1 4.5 4.5 8.8C19.5 14.8 12 21 12 21z"
                 fill="${favorites.includes(product.id) ? "#ff6000" : "none"}"
-                stroke="#ff6000" stroke-width="2"/>
+                stroke="#ff6000"
+                stroke-width="2"/>
             `;
 
             // Kalbe tıklanınca ekleme ve çıkarma
             heart.onclick = (e) => {
-                // 
                 e.stopPropagation();
                 if (favorites.includes(product.id)) {
                     favorites = favorites.filter(id => id !== product.id);
@@ -234,6 +296,7 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             item.appendChild(img);
             item.appendChild(name);
             item.appendChild(prices);
+            item.appendChild(starsContainer);
             item.appendChild(heart);
             item.appendChild(addCartBtn);
             list.appendChild(item);
