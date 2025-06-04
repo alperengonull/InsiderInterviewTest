@@ -125,8 +125,6 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
         }
         .carousel-stars {
             left: 20px;
-            width: 32px;
-            height: 28px;
             cursor: pointer;
             transition: fill .2s;
             display:flex;
