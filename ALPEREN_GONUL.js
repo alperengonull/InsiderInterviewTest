@@ -10,7 +10,16 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
         const LS_FAV_KEY = "my_favorites";
         const LS_STARS_KEY = "product_stars";
         let products = [];
-        let favorites = JSON.parse(localStorage.getItem(LS_FAV_KEY)) || [];
+        // let favorites = JSON.parse(localStorage.getItem(LS_FAV_KEY)) || [];
+        let favorites;
+        try {
+            favorites = JSON.parse(localStorage.getItem(LS_FAV_KEY) || [])
+        } catch (error) {
+            favorites = []
+            localStorage.setItem(LS_FAV_KEY, JSON.stringify(favorites));
+        }
+
+
         let favoriteStars = JSON.parse(localStorage.getItem(LS_STARS_KEY)) || [];
 
         // Ürünleri önce localStorage'dan, eğer yoksa API'den çekiyorum.
@@ -27,6 +36,105 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             }
         }
 
+
+        // const filterFavorites = products.filter(
+        //     product => favorites.includes(product.id)
+        // )
+
+        // console.log(filterFavorites)
+
+
+
+
+
+        // const filterFavoritesAccBrand = products.filter(
+        //     product => favorites.includes(product.id) && product.brand === "HelloBaby"
+        // )
+
+        // console.log(filterFavoritesAccBrand)
+
+        // const filterFavorites = products
+        //     .filter(product => favorites.includes(product.id))
+
+        // console.log(filterFavorites)
+
+
+
+
+        // const filterfavproduct = products.filter(product => favorites.includes(product.id))
+        //     .map(product => product.name)
+
+        //     console.log(filterfavproduct)
+
+        // const filterCheapProduct = products
+        //     .filter(product => favorites.includes(product.id) && product.price < 200)
+        //     .map(product => product.name)
+        // console.log(filterCheapProduct)
+
+
+        // function getCheapFavorites(products, favorites) {
+        //     return products.filter(product => favorites.includes(product.id) && product.price < 200)
+        //         .map(product => product.name)
+
+        // }
+
+        // console.log(getCheapFavorites(products, favorites))
+
+
+
+        // const getProductWithDiscount = products
+        //     .map(
+        //         product => ({
+        //             ...products,
+        //             discount: ((product.original_price - product.price) / product.original_price * 100)
+        //         })
+        //     )
+        //     .sort((a, b) => b.discount - a.discount)
+
+        // console.log(getProductWithDiscount)
+
+
+
+        // const filterCheapProductNames = products.filter(product => product.price < 200)
+        //     .map(product => product.name);
+
+
+        // console.log(filterCheapProductNames);
+
+
+        // const productWithDiscount = products
+        //     .map(
+        //         product => ({
+        //             ...products,
+        //             discount: ((product.original_price - product.price) / product.original_price * 100)
+        //         })
+        //     )
+        //     .sort((a, b) =>
+        //         b.discount - a.discount
+        //     )
+
+
+        // console.log(productWithDiscount)
+
+
+
+        // const x = products
+        //     .filter(product => product.brand === "HelloBaby")
+        //     .map(
+        //         product => ({ id: product.id, price: product.price })
+        //     )
+        //     .sort((a, b) =>
+        //         b.price - a.price
+        //     )
+
+        // console.log(x)
+
+
+        const x = products.filter(product => favorites.includes(product.id) && product.price < 200)
+            .sort((a, b) => a.price - b.price)
+        console.log(x)
+
+
         // Stiller
         const style = document.createElement("style");
         style.innerHTML = `
@@ -36,7 +144,6 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             margin: 40px auto;
             padding: 32px 24px;
             background: #fff;
-            border-radius: 16px;
             box-shadow: 0 2px 24px rgba(0,0,0,0.10);
             font-family: Arial,sans-serif;
         }
@@ -240,13 +347,34 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
         `;
         document.body.prepend(container);
 
+
+
+
+
+
+
         // Ürünlerin ekleneceği listeyi seçiyorum.
         const list = container.querySelector(".carousel-list");
+
+
+        list.addEventListener('click', (event) => {
+            const item = event.target.closest('.carousel-item');
+            if (!item) return;
+
+            const url = item.dataset.productUrl;
+
+            if (url) {
+                window.open(url, "_blank");
+            }
+        });
+
 
         // Her ürün için kart oluşturuyorum.
         products.forEach(product => {
             const item = document.createElement("div");
             item.className = "carousel-item";
+            item.dataset.productUrl = product.url;
+
 
             // Ürün resmi ve link
             const img = document.createElement("img");
@@ -264,6 +392,7 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             // Fiyatlar ve indirim
             const prices = document.createElement("div");
             prices.className = "carousel-prices";
+
             if (product.price !== product.original_price) {
                 prices.innerHTML = `
             <div style="display:flex; gap:8px; align-items:center;">
@@ -316,6 +445,7 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
             }
 
 
+
             const heart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             heart.setAttribute("viewBox", "0 0 24 24");
             heart.classList.add("carousel-heart");
@@ -349,8 +479,8 @@ if (window.location.pathname !== "/" && window.location.pathname !== "/index.htm
                 alert("Ürün sepete eklendi!");
             };
 
-            // Tıklanınca ürün sayfası yeni sekmede açılır
-            item.onclick = () => window.open(product.url, "_blank");
+            // // Tıklanınca ürün sayfası yeni sekmede açılır
+            // item.onclick = () => window.open(product.url, "_blank");
 
 
             // Tüm elemanları kartın içine ekliyorum.
